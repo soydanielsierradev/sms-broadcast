@@ -1,0 +1,7 @@
+export const THEME_KEY = '@app_theme'
+export const PORT_KEY = '@app_port'
+export const AUTO_START_KEY = '@app_auto_start'
+export const LANGUAGE_KEY = '@app_language'
+export const SERVER_RUNNING_KEY = '@app_server_running'
+export const AUTH_TOKEN_KEY = '@app_auth_token'
+export const LOG_ENTRIES_KEY = '@app_log_entries'
