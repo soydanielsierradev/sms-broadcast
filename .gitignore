@@ -1,0 +1,47 @@
+# Dependencies
+**/node_modules/
+
+# Build outputs
+**/dist/
+**/target/
+**/android/app/build/
+**/android/build/
+**/android/.gradle/
+**/.gradle/
+
+# Signing keys — never commit
+**/*.keystore
+**/*.jks
+**/google-services.json
+
+# Local Android config
+**/android/local.properties
+
+# Environment
+**/.env
+**/.env.*
+!**/.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# React Native cache
+**/.metro-health-check*
+**/.cache/
+
+# Sample / real data
+**/*.csv
+
+# Internal tooling
+**/.atl/

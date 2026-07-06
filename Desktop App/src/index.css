@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Chassis: pure white paper, black ink */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 4%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
+
+    /* Wine — brand + interactive */
+    --primary: 353 60% 30%;
+    --primary-foreground: 0 0% 98%;
+
+    /* Panel — sidebar, muted surfaces */
+    --secondary: 60 5% 96%;
+    --secondary-foreground: 0 0% 10%;
+
+    --muted: 60 5% 96%;
+    --muted-foreground: 0 0% 42%;
+
+    --accent: 60 5% 96%;
+    --accent-foreground: 0 0% 10%;
+
+    /* Alarm — distinct hue from wine */
+    --destructive: 0 74% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 353 60% 30%;
+
+    --radius: 0.375rem;
+
+    /* Semantic extras */
+    --signal: 353 60% 30%;
+    --signal-muted: 353 60% 94%;
+    --success: 142 71% 34%;
+    --success-foreground: 0 0% 98%;
+    --warning: 42 92% 50%;
+    --warning-foreground: 0 0% 10%;
+    --panel: 60 5% 96%;
+
+    /* Typography roles — Roboto everywhere to match Mobile App (Android system) */
+    --font-sans: "Roboto", system-ui, -apple-system, sans-serif;
+    --font-display: "Roboto", system-ui, sans-serif;
+    --font-mono: "Roboto", ui-monospace, monospace;
+  }
+
+  .dark {
+    /* Chassis: pure black shell, warm ink */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 96%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 96%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 96%;
+
+    /* Wine — lifted to hold presence on black */
+    --primary: 350 55% 42%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 96%;
+
+    --muted: 0 0% 8%;
+    --muted-foreground: 0 0% 64%;
+
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 96%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 350 55% 42%;
+
+    --signal: 350 55% 42%;
+    --signal-muted: 350 55% 10%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 98%;
+    --warning: 42 92% 55%;
+    --warning-foreground: 0 0% 10%;
+    --panel: 0 0% 8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+@layer components {
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+    font-feature-settings: "tnum" on, "zero" on;
+  }
+
+  /* Equipment label — used for section headings and eyebrows */
+  .label-eq {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* LED indicator dot. Each state sets --led-color so pulse halos match. */
+  .led {
+    --led-color: var(--muted-foreground);
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: hsl(var(--led-color) / 0.35);
+    flex-shrink: 0;
+    transition: background 150ms ease;
+  }
+  /* Brand/accent LED — wine. Used for sidebar logo and nav item active state. */
+  .led-active {
+    --led-color: var(--signal);
+    background: hsl(var(--led-color));
+    box-shadow: 0 0 0 3px hsl(var(--led-color) / 0.15);
+  }
+  /* Connection = OK */
+  .led-ok {
+    --led-color: var(--success);
+    background: hsl(var(--led-color));
+    box-shadow: 0 0 0 3px hsl(var(--led-color) / 0.15);
+  }
+  /* Connection = probing */
+  .led-testing {
+    --led-color: var(--warning);
+    background: hsl(var(--led-color));
+    box-shadow: 0 0 0 3px hsl(var(--led-color) / 0.15);
+  }
+  .led-error {
+    --led-color: var(--destructive);
+    background: hsl(var(--led-color));
+    box-shadow: 0 0 0 3px hsl(var(--led-color) / 0.15);
+  }
+  .led-pulse {
+    animation: led-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes led-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 0 3px hsl(var(--led-color) / 0.15);
+    }
+    50% {
+      opacity: 0.75;
+      box-shadow: 0 0 0 6px hsl(var(--led-color) / 0.05);
+    }
+  }
+}
