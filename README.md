@@ -1,107 +1,107 @@
 # SMS Broadcast
 
-Sistema de envío masivo de SMS compuesto por dos apps que trabajan en conjunto: una **app de escritorio para Windows** (donde gestionás tus campañas y contactos) y una **app móvil para Android** (que actúa como servidor SMS usando la SIM de tu celular).
+A two-app system for bulk SMS campaigns: a **Windows desktop app** to manage contacts and campaigns, and an **Android mobile app** that acts as an SMS server using your phone's SIM card.
 
 ---
 
-## ¿Cómo funciona?
+## How It Works
 
 ```
 ┌─────────────────────┐        WiFi / Hotspot        ┌──────────────────────┐
 │   Desktop (Windows) │ ◄──────────────────────────► │   Mobile (Android)   │
 │                     │   HTTP + Bearer Token Auth    │                      │
-│  • Gestión de       │                               │  • Servidor HTTP     │
-│    contactos        │   POST /send-sms              │  • SIM del celular   │
-│  • Campañas SMS     │ ──────────────────────────►   │  • Foreground Service│
-│  • Historial        │                               │  • Envío nativo SMS  │
-│  • Pareo QR         │   QR pairing (primera vez)    │  • QR de pareo       │
+│  • Contact manager  │                               │  • HTTP server       │
+│  • SMS campaigns    │   POST /send-sms              │  • Native SIM access │
+│  • History & logs   │ ──────────────────────────►   │  • Foreground service│
+│  • QR pairing       │                               │  • Native SMS module │
 └─────────────────────┘ ◄──────────────────────────── └──────────────────────┘
+                               QR pairing (first run)
 ```
 
-1. Instalás la app móvil en tu Android y la dejás corriendo (foreground service).
-2. La app móvil genera un QR con su IP local y un token de autenticación.
-3. La app de escritorio escanea el QR y queda pareada automáticamente.
-4. Desde el escritorio creás una campaña, elegís una lista de contactos y disparás el envío.
-5. El escritorio envía cada SMS a la app móvil vía HTTP; el celular los envía usando la SIM.
+1. Install the mobile app on your Android and start the server.
+2. The mobile app generates a QR code with its local IP and a Bearer auth token.
+3. The desktop app scans the QR and pairs automatically — no manual config needed.
+4. From the desktop, create a campaign, select a contact list, and send.
+5. The desktop sends each SMS request to the mobile over HTTP; the phone delivers them via the SIM.
 
 ---
 
-## Stack Tecnológico
+## Tech Stack
 
 ### Desktop
 - **Tauri 2.0** (Rust) + **React 19** + Vite + TypeScript
 - Tailwind CSS v3 + shadcn/ui + next-themes (dark/light mode)
 - Zustand · Zod · React Hook Form · React Router v7 · Sonner
-- SQLite (rusqlite) para persistencia local
-- Token Bearer almacenado en keyring del SO (nunca en base de datos)
+- SQLite (rusqlite) for local persistence
+- Bearer token stored in the OS keyring (never in the database)
 
 ### Mobile
-- **React Native 0.86** + TypeScript (Android únicamente)
-- NativeWind v4 (Tailwind para React Native) + componentes estilo shadcn
-- Zustand · i18next (español/inglés) · React Navigation (bottom tabs)
-- Servidor HTTP/TCP nativo via `react-native-tcp-socket`
-- Foreground Service nativo en Kotlin (Android 14+ compatible)
-- Módulo SMS nativo en Kotlin via `SmsManager`
+- **React Native 0.86** + TypeScript (Android only)
+- NativeWind v4 (Tailwind for React Native) + shadcn-style components
+- Zustand · i18next (Spanish / English) · React Navigation (bottom tabs)
+- HTTP/TCP server via `react-native-tcp-socket`
+- Native Kotlin Foreground Service (Android 14+ compatible)
+- Native Kotlin SMS module via `SmsManager`
 
 ---
 
-## Descarga e Instalación
+## Download & Installation
 
-### App Móvil (Android)
+### Mobile App (Android)
 
-> Requiere Android con permiso de envío de SMS.
+> Requires an Android device with SMS sending capability.
 
-1. Descargá el APK desde [Releases → mobile-v1.0.0](../../releases/tag/mobile-v1.0.0).
-2. En tu Android, habilitá **"Instalar apps de fuentes desconocidas"** (Ajustes → Seguridad).
-3. Abrí el APK descargado e instalalo.
-4. Al abrir la app, concedé el permiso de **Enviar SMS** cuando te lo solicite.
-5. En la pestaña **Inicio**, tocá **Iniciar servidor**.
-6. La app queda corriendo en segundo plano — no la cerrés.
+1. Download `sms-broadcast-mobile.apk` from [Releases → mobile-v1.0.0](../../releases/tag/mobile-v1.0.0).
+2. On your Android device, enable **Install from unknown sources** (Settings → Security).
+3. Open and install the downloaded APK.
+4. When prompted, grant the **Send SMS** permission.
+5. On the **Home** tab, tap **Start server**.
+6. Leave the app running in the background — do not close it.
 
-### App de Escritorio (Windows)
+### Desktop App (Windows)
 
-> Requiere Windows 10 o superior. No necesita instalación.
+> Requires Windows 10 or later. No installation needed.
 
-1. Descargá el ZIP desde [Releases → desktop-v1.0.0](../../releases/tag/desktop-v1.0.0).
-2. Descomprimí el ZIP en cualquier carpeta.
-3. Ejecutá `SMS Broadcast.exe`.
-
----
-
-## Pareo (primera vez)
-
-1. Con el servidor móvil corriendo, tocá el botón **Mostrar QR** en la app móvil.
-2. En la app de escritorio, al iniciar por primera vez se abrirá la pantalla de pareo.
-3. Hacé clic en **Escanear QR** y apuntá la cámara al QR del celular.
-4. La conexión queda configurada automáticamente — no hace falta volver a parear salvo que rotas el token.
-
-> Ambos dispositivos deben estar en la **misma red WiFi** o el celular debe compartir **hotspot** al que se conecta la PC.
+1. Download `SMS-Broadcast-Portable-v1.0.0.zip` from [Releases → desktop-v1.0.0](../../releases/tag/desktop-v1.0.0).
+2. Extract the ZIP to any folder.
+3. Run `SMS Broadcast.exe`.
 
 ---
 
-## Funcionalidades
+## Pairing (First Run)
 
-- **Contactos**: alta, baja, modificación e importación desde CSV.
-- **Listas**: agrupá contactos en listas reutilizables.
-- **Campañas**: creá un mensaje con variables `{{nombre}}` y `{{numero}}`, elegí una lista y enviá.
-- **Progreso en tiempo real**: barra de avance, estado por contacto (enviado ✅ / error ❌).
-- **Historial**: revisá todas las campañas anteriores con log detallado.
-- **Seguridad**: autenticación Bearer con token de 32 caracteres hex, renovable desde la app móvil.
-- **Dark/Light mode**: en ambas apps.
-- **Internacionalización**: español e inglés en la app móvil.
+1. With the mobile server running, tap **Show QR** on the mobile app's Home screen.
+2. On the desktop app, the pairing screen opens automatically on first launch.
+3. Click **Scan QR** and point your camera at the phone's QR code.
+4. The connection is configured automatically. Re-pairing is only needed if the token is rotated.
+
+> Both devices must be on the **same Wi-Fi network**, or the phone must share a **hotspot** that the PC connects to.
 
 ---
 
-## Desarrollo
+## Features
 
-### Requisitos
+- **Contacts** — add, edit, delete, and import from CSV.
+- **Lists** — group contacts into reusable lists.
+- **Campaigns** — compose a message with `{{name}}` and `{{number}}` variables, pick a list, and send.
+- **Real-time progress** — animated progress bar with per-contact status (sent ✅ / error ❌).
+- **History** — review all past campaigns with detailed logs.
+- **Security** — 32-character hex Bearer token, rotatable from the mobile app.
+- **Dark / Light mode** — supported in both apps.
+- **Internationalization** — Spanish and English in the mobile app.
+
+---
+
+## Development
+
+### Requirements
 
 - Node.js ≥ 22
-- Rust (toolchain stable)
-- Android Studio + SDK (para la app móvil)
-- Arch Linux / macOS para desarrollo (la app desktop compila para Windows vía `cargo-xwin`)
+- Rust (stable toolchain)
+- Android Studio + SDK (for the mobile app)
+- Arch Linux or macOS for development (desktop cross-compiles to Windows via `cargo-xwin`)
 
-### Desktop (desarrollo)
+### Desktop (dev server)
 
 ```bash
 cd "Desktop App"
@@ -109,7 +109,7 @@ npm install
 npm run tauri dev
 ```
 
-### Mobile (desarrollo)
+### Mobile (dev build)
 
 ```bash
 cd "Mobile App/SmsBroadcast"
@@ -117,7 +117,7 @@ npm install
 npx react-native run-android
 ```
 
-### Build de producción — Desktop (Windows)
+### Production build — Desktop (Windows)
 
 ```bash
 cd "Desktop App"
@@ -126,9 +126,10 @@ cargo install cargo-xwin
 npm run tauri build -- --target x86_64-pc-windows-msvc
 ```
 
-### Build de producción — Mobile (APK release)
+### Production build — Mobile (release APK)
 
-Requiere keystore de firma y credenciales en `~/.gradle/gradle.properties`:
+Requires a signing keystore and credentials in `~/.gradle/gradle.properties`:
+
 ```
 SMS_RELEASE_STORE_FILE=sms-broadcast-release.keystore
 SMS_RELEASE_STORE_PASSWORD=...
@@ -139,11 +140,11 @@ SMS_RELEASE_KEY_PASSWORD=...
 ```bash
 cd "Mobile App/SmsBroadcast/android"
 ./gradlew assembleRelease
-# APK en: app/build/outputs/apk/release/app-release.apk
+# Output: app/build/outputs/apk/release/app-release.apk
 ```
 
 ---
 
-## Licencia
+## License
 
 MIT
